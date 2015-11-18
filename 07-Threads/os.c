@@ -51,6 +51,12 @@ static void busy_loop(void *str)
 	}
 }
 
+extern void fibonacci(int n);
+void to_fib(void *userdata){
+	int* n= (int*) userdata;
+	fibonacci(*n);
+}
+
 void test1(void *userdata)
 {
 	busy_loop(userdata);
@@ -74,18 +80,25 @@ void test3(void *userdata)
 
 int main(void)
 {
-	const char *str1 = "Task1", *str2 = "Task2", *str3 = "Task3";
+//	const char *str1 = "Task1", *str2 = "Task2", *str3 = "Task3";
+	int i,id[50];
 
 	usart_init();
 
-	if (thread_create(test1, (void *) str1) == -1)
-		print_str("Thread 1 creation failed\r\n");
+	for(i=1; i<50; ++i){
+		id[i]=i;
+		if (thread_create(to_fib,(void *) (id+i) ) == -1)
+			print_str("Thread creation failed\r\n");
+	}
 
-	if (thread_create(test2, (void *) str2) == -1)
-		print_str("Thread 2 creation failed\r\n");
-
-	if (thread_create(test3, (void *) str3) == -1)
-		print_str("Thread 3 creation failed\r\n");
+//	if (thread_create(test1, (void *) str1) == -1)
+//		print_str("Thread 1 creation failed\r\n");
+//
+//	if (thread_create(test2, (void *) str2) == -1)
+//		print_str("Thread 2 creation failed\r\n");
+//
+//	if (thread_create(test3, (void *) str3) == -1)
+//		print_str("Thread 3 creation failed\r\n");
 
 	/* SysTick configuration */
 	*SYSTICK_LOAD = (CPU_CLOCK_HZ / TICK_RATE_HZ) - 1UL;
