@@ -16,6 +16,7 @@ typedef struct {
 static tcb_t tasks[MAX_TASKS];
 static int lastTask;
 static int first = 1;
+extern void print_str(const char *str);
 
 /* FIXME: Without naked attribute, GCC will corrupt r7 which is used for stack
  * pointer. If so, after restoring the tasks' context, we will get wrong stack

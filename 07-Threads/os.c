@@ -1,7 +1,9 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdint.h>
 #include "reg.h"
 #include "threads.h"
+#define MAX_BUF 100
 
 /* USART TXE Flag
  * This flag is cleared when data is written to USARTx_DR and
@@ -51,10 +53,23 @@ static void busy_loop(void *str)
 	}
 }
 
-extern void fibonacci(int n);
+void print_int(int n){
+	int i;
+	char buffer[MAX_BUF];
+	buffer[MAX_BUF-1]='\0';
+	for(i=MAX_BUF-2; n; --i,n/=10)
+		buffer[i]=n%10+'0';
+	print_str(buffer+i+1);
+}
+
+extern int fibonacci(int n);
 void to_fib(void *userdata){
 	int* n= (int*) userdata;
-	fibonacci(*n);
+	print_str("The fibonacci sequence at ");
+	print_int(*n);
+	print_str(" is ");
+	print_int(fibonacci(*n));
+	print_str("\n");
 }
 
 void test1(void *userdata)
@@ -85,9 +100,9 @@ int main(void)
 
 	usart_init();
 
-	for(i=1; i<50; ++i){
+	for(i=10; i<14; ++i){
 		id[i]=i;
-		if (thread_create(to_fib,(void *) (id+i) ) == -1)
+		if( thread_create(to_fib, (void *) (id+i) ) == -1 )
 			print_str("Thread creation failed\r\n");
 	}
 
